@@ -33,21 +33,24 @@ namespace SalesWebMVC
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // É atribuida a string de conexão configurada no appsettings.json
             var connectionString = Configuration["MySqlConnection:MySqlConnectionString"];
             // Adiciona o contexto do MySQL
             services.AddDbContext<SalesWebMVCContext>(Options => Options.UseMySql(connectionString));
+
+            services.AddScoped<SeedingService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, SeedingService seedingService)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                seedingService.Seed(); // Chama o método para popular a base de dados caso ela não esteja cheia
             }
             else
             {
